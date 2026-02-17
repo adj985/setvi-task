@@ -7,11 +7,10 @@
     <groupId>org.example</groupId>
     <artifactId>setvi-task</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
 
     <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <build>
@@ -21,7 +20,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <suiteXmlFiles>testng.xml</suiteXmlFiles>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
                     <properties>
                         <property>
                             <name>parallel</name>

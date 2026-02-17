@@ -1,4 +1,4 @@
-package apiTests;
+package tests;
 
 import baseApi.BaseApiTest;
 import baseApi.BodyParams;
