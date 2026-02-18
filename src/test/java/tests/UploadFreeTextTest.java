@@ -27,9 +27,8 @@ public class UploadFreeTextTest extends BaseApiTest {
 
     }
 
-    @Test(description = "")
-    public void uploadFreeTextUnauthorized(){
-
+    @Test(description = "Returns 401 when upload-free-text is called with an invalid API key")
+    public void uploadFreeTextUnauthorized() {
         String invalidApiKey = "a8f9a8f-a9sya9sf78";
 
         UploadFreeTextRequest body = new UploadFreeTextRequest()
