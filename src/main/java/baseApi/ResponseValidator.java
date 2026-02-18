@@ -9,8 +9,6 @@ import java.util.Map;
 
 public class ResponseValidator {
 
-    public static final String EMPTY_STRING = "";
-
     private final Response response;
 
     public ResponseValidator(Response response) {
@@ -36,11 +34,6 @@ public class ResponseValidator {
     public ResponseValidator verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount, String message) {
         Assert.assertTrue(getMatchedInternalProductsIdCount() <= maxCount, message);
         return this;
-    }
-
-    private Object getResponseValueFromJsonObject(String objectParam, String param) {
-        Map<String, Object> arrayParameter = response.jsonPath().get(objectParam);
-        return arrayParameter.get(param);
     }
 
     private Object getResponseValue(String param) {
@@ -78,26 +71,12 @@ public class ResponseValidator {
         return (List<Map<String, Object>>) matchedInternalProducts;
     }
 
-
-    public ResponseValidator verifyTimeOfCreation(String actualTime, String expectedTime) {
-        long actual = Long.parseLong(actualTime);
-        long expected = Long.parseLong(expectedTime);
-
-        try {
-            Assert.assertEquals(actual, expected);
-        } catch (AssertionError e) {
-            Assert.assertEquals(actual, expected - 1L);
-        }
-
-        return this;
-    }
-
     private Map<String, Object> getFirstResultItem(String itemsPath) {
         List<Map<String, Object>> items = response.jsonPath().getList(itemsPath);
         if (items == null || items.isEmpty()) {
             return null;
         }
-        return items.get(0);
+        return items.getFirst();
     }
 
     private void printResponseBody() {
