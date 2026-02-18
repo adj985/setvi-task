@@ -3,6 +3,8 @@ package baseApi;
 import io.restassured.response.Response;
 import org.testng.Assert;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class ResponseValidator {
@@ -16,68 +18,64 @@ public class ResponseValidator {
         printResponseBody();
     }
 
-    public ResponseValidator verifyResponseValue(String param, Object expectedValue) {
-        String valueFromParam = getResponseValue(param).toString();
-        Assert.assertEquals(valueFromParam, expectedValue.toString());
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueFromObject(String arrayParam, String param, Object expectedValue) {
-        try{
-            String actualValue = getResponseValueFromJsonObject(arrayParam, param).toString();
-            Assert.assertEquals(actualValue, expectedValue);
-        } catch (NullPointerException e){
-            Assert.assertNull(expectedValue);
-        }
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueEmpty(String param) {
-        String valueFromParam = response.jsonPath().get(param);
-        Assert.assertTrue(valueFromParam.isEmpty());
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueEmpty(String arrayParam, String param) {
-        Object valueFromParam = getResponseValueFromJsonObject(arrayParam, param);
-        Assert.assertEquals(valueFromParam, EMPTY_STRING);
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueNotEmpty(String param) {
-        Object valueFromParam = getResponseValue(param);
-        Assert.assertNotEquals(valueFromParam, EMPTY_STRING);
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueExists(String param){
-        Assert.assertTrue(response.getBody().asString().contains(param));
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueNotExists(String param){
-        Assert.assertFalse(response.getBody().asString().contains(param));
-        return this;
-    }
-
-    public ResponseValidator verifyResponseValueNotEmpty(String arrayParam, String param) {
-        Object valueFromParam = getResponseValueFromJsonObject(arrayParam, param);
-        Assert.assertNotEquals(valueFromParam, EMPTY_STRING);
-        return this;
-    }
-
     public ResponseValidator verifyStatusCode(int statusCode) {
         Assert.assertEquals(response.getStatusCode(), statusCode);
         return this;
     }
 
-    public Object getResponseValue(String param) {
-        return response.jsonPath().get(param);
+    public ResponseValidator verifyMessageEquals(String expectedMessage) {
+        Assert.assertEquals(getResponseValue(BodyParams.MESSAGE).toString(), expectedMessage);
+        return this;
+    }
+
+    public ResponseValidator verifyMatchedInternalProductsIdCountEquals(long expectedCount, String message) {
+        Assert.assertEquals(getMatchedInternalProductsIdCount(), expectedCount, message);
+        return this;
+    }
+
+    public ResponseValidator verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount, String message) {
+        Assert.assertTrue(getMatchedInternalProductsIdCount() <= maxCount, message);
+        return this;
     }
 
     private Object getResponseValueFromJsonObject(String objectParam, String param) {
         Map<String, Object> arrayParameter = response.jsonPath().get(objectParam);
         return arrayParameter.get(param);
+    }
+
+    private Object getResponseValue(String param) {
+        return response.jsonPath().get(param);
+    }
+
+    private long getMatchedInternalProductsIdCount() {
+        List<Map<String, Object>> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
+        return matchedInternalProducts.stream()
+                .filter(product -> product.get("_id") != null)
+                .count();
+    }
+
+    private List<Map<String, Object>> getMatchedInternalProductsFromFirstResultItem() {
+        Map<String, Object> firstMatchedItem = getFirstResultItem("result.matchedItems");
+        if (firstMatchedItem != null) {
+            return getMatchedInternalProducts(firstMatchedItem);
+        }
+
+        Map<String, Object> firstNotMatchedItem = getFirstResultItem("result.notMatchedItems");
+        if (firstNotMatchedItem != null) {
+            return getMatchedInternalProducts(firstNotMatchedItem);
+        }
+
+        Assert.fail("Could not find matchedItems/notMatchedItems in response");
+        return Collections.emptyList();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> getMatchedInternalProducts(Map<String, Object> item) {
+        Object matchedInternalProducts = item.get("matchedInternalProducts");
+        if (matchedInternalProducts == null) {
+            return Collections.emptyList();
+        }
+        return (List<Map<String, Object>>) matchedInternalProducts;
     }
 
 
@@ -92,6 +90,14 @@ public class ResponseValidator {
         }
 
         return this;
+    }
+
+    private Map<String, Object> getFirstResultItem(String itemsPath) {
+        List<Map<String, Object>> items = response.jsonPath().getList(itemsPath);
+        if (items == null || items.isEmpty()) {
+            return null;
+        }
+        return items.get(0);
     }
 
     private void printResponseBody() {

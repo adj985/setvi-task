@@ -1,13 +1,10 @@
 package tests;
 
 import baseApi.BaseApiTest;
-import baseApi.BodyParams;
 import baseApi.Constants;
-import com.google.gson.JsonObject;
+import baseApi.model.UploadFreeTextRequest;
 import org.testng.annotations.Test;
 
-import static baseApi.BodyParams.*;
-import static baseApi.Endpoints.UPLOAD_FREE_TEXT;
 import static baseApi.ErrorMessages.*;
 
 public class UploadFreeTextTest extends BaseApiTest {
@@ -18,15 +15,15 @@ public class UploadFreeTextTest extends BaseApiTest {
     @Test(description = " Returns 400 if the text is empty with the appropriate message")
     public void uploadFreeTextEmptyTextTest() {
 
-        JsonObject body = new JsonObject();
-        body.addProperty(TEXT, "");
-        body.addProperty(TOP_K, 3);
-        body.addProperty(THRESHOLD, 0.5);
-        body.addProperty(ENABLE_PRIVATE_LABEL_RANKING, false);
+        UploadFreeTextRequest body = new UploadFreeTextRequest()
+                .text("")
+                .topK(3)
+                .threshold(0.5)
+                .enablePrivateLabelRanking(false);
 
-        postRequest(UPLOAD_FREE_TEXT, Constants.API_KEY, body)
+        uploadFreeText(Constants.API_KEY, body)
                 .verifyStatusCode(400)
-                .verifyResponseValue(MESSAGE, MUST_NOT_BE_NULL_OR_WHITESPACE);
+                .verifyMessageEquals(MUST_NOT_BE_NULL_OR_WHITESPACE);
 
     }
 
@@ -35,15 +32,43 @@ public class UploadFreeTextTest extends BaseApiTest {
 
         String invalidApiKey = "a8f9a8f-a9sya9sf78";
 
-        JsonObject body = new JsonObject();
-        body.addProperty(BodyParams.TEXT, "Some text");
-        body.addProperty(BodyParams.TOP_K, 3);
-        body.addProperty(BodyParams.THRESHOLD, 0.5);
-        body.addProperty(BodyParams.ENABLE_PRIVATE_LABEL_RANKING, false);
+        UploadFreeTextRequest body = new UploadFreeTextRequest()
+                .text("Some text")
+                .topK(3)
+                .threshold(0.5)
+                .enablePrivateLabelRanking(false);
 
-        postRequest(UPLOAD_FREE_TEXT, invalidApiKey, body)
+        uploadFreeText(invalidApiKey, body)
                 .verifyStatusCode(401);
 
+    }
+
+    /**
+     * N4 bug report check
+     * topK parameter should define number of returned products
+     */
+    @Test(description = "Respects topK value when matching free text products")
+    public void uploadFreeTextTopKRespectedTest() {
+        UploadFreeTextRequest bodyTopKOne = new UploadFreeTextRequest()
+                .text("Some text")
+                .topK(1)
+                .threshold(0.5)
+                .enablePrivateLabelRanking(false);
+
+        UploadFreeTextRequest bodyTopKTen = new UploadFreeTextRequest()
+                .text("Some text")
+                .topK(10)
+                .threshold(0.5)
+                .enablePrivateLabelRanking(false);
+
+        uploadFreeText(Constants.API_KEY, bodyTopKOne)
+                .verifyStatusCode(200)
+                .verifyMatchedInternalProductsIdCountEquals(1,
+                        "topK=1 should return exactly 1 product");
+        uploadFreeText(Constants.API_KEY, bodyTopKTen)
+                .verifyStatusCode(200)
+                .verifyMatchedInternalProductsIdCountLessThanOrEqual(10,
+                        "topK=10 should return up to 10 products");
     }
 
 }

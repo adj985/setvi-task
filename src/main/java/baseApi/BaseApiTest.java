@@ -1,30 +1,40 @@
 package baseApi;
 
-import com.google.gson.JsonObject;
+import baseApi.model.UploadFreeTextRequest;
+import baseApi.model.UploadUrlRequest;
+import com.google.gson.Gson;
 import io.restassured.RestAssured;
-
-import java.util.HashMap;
-import java.util.Map;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 
 public class BaseApiTest extends RestAssured {
 
-    protected ResponseValidator postRequest(String endpoint, String apiKey,
-                                            JsonObject requestBody) {
+    private final Gson gson = new Gson();
 
-        Map<String, Object> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", apiKey);
+    protected ResponseValidator postRequest(String endpoint, String apiKey, Object requestBody) {
 
         return new ResponseValidator(
                 given()
-                        .headers(headers)
-                        .body(requestBody)
+                        .spec(buildRequestSpec(apiKey))
+                        .body(gson.toJson(requestBody))
                         .when()
-                        .post(getInstanceUrl(Constants.BASE_URL, endpoint)));
+                        .post(endpoint));
     }
 
-    private String getInstanceUrl(String baseUrl, String endpoint) {
-        return String.format("%s%s", baseUrl , endpoint);
+    protected ResponseValidator uploadFreeText(String apiKey, UploadFreeTextRequest requestBody) {
+        return postRequest(Endpoints.UPLOAD_FREE_TEXT, apiKey, requestBody);
+    }
+
+    protected ResponseValidator uploadUrl(String apiKey, UploadUrlRequest requestBody) {
+        return postRequest(Endpoints.UPLOAD_URL_HTML, apiKey, requestBody);
+    }
+
+    private RequestSpecification buildRequestSpec(String apiKey) {
+        return new RequestSpecBuilder()
+                .setBaseUri(Constants.BASE_URL)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", apiKey)
+                .build();
     }
 
 }
