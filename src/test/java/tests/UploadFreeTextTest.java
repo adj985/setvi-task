@@ -70,4 +70,31 @@ public class UploadFreeTextTest extends BaseApiTest {
                         "topK=10 should return up to 10 products");
     }
 
+    /**
+     * N5 bug report check.
+     * Special characters should not break matching.
+     */
+    @Test(description = "Handles accents and quotes in free text without returning empty matches")
+    public void uploadFreeTextSpecialCharactersShouldStillMatchProductsTest() {
+        UploadFreeTextRequest accentedTextBody = new UploadFreeTextRequest()
+                .text("Café & Restaurant Supplies")
+                .threshold(0.5)
+                .topK(3);
+
+        UploadFreeTextRequest quotedMeasurementBody = new UploadFreeTextRequest()
+                .text("24\" x 18\" board")
+                .threshold(0.5)
+                .topK(3);
+
+        uploadFreeText(Constants.API_KEY, accentedTextBody)
+                .verifyStatusCode(200)
+                .verifyMatchedInternalProductsIdCountGreaterThan(0,
+                        "Expected non-empty matches for accent-insensitive text: 'Café & Restaurant Supplies'");
+
+        uploadFreeText(Constants.API_KEY, quotedMeasurementBody)
+                .verifyStatusCode(200)
+                .verifyMatchedInternalProductsIdCountGreaterThan(0,
+                        "Expected non-empty matches for quoted measurement text: '24\" x 18\" board'");
+    }
+
 }

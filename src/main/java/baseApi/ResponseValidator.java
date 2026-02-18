@@ -36,6 +36,11 @@ public class ResponseValidator {
         return this;
     }
 
+    public ResponseValidator verifyMatchedInternalProductsIdCountGreaterThan(long minCount, String message) {
+        Assert.assertTrue(getMatchedInternalProductsIdCount() > minCount, message);
+        return this;
+    }
+
     private Object getResponseValue(String param) {
         return response.jsonPath().get(param);
     }
