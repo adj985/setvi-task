@@ -2,7 +2,7 @@ package tests.bugs.negative;
 
 import baseApi.BaseApiTest;
 import baseApi.constants.Constants;
-import baseApi.model.request.UploadFreeTextRequest;
+import baseApi.models.request.UploadFreeTextRequest;
 import org.testng.annotations.Test;
 
 import static baseApi.constants.ErrorMessages.*;

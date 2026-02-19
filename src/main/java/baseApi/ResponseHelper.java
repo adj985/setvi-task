@@ -2,8 +2,8 @@ package baseApi;
 
 import baseApi.constants.BodyParams;
 import baseApi.constants.ItemsPath;
-import baseApi.model.response.MatchedInternalProductResponse;
-import baseApi.model.response.MatchedItemResponse;
+import baseApi.models.response.MatchedInternalProductResponse;
+import baseApi.models.response.MatchedItemResponse;
 import io.restassured.response.Response;
 import org.testng.Assert;
 
@@ -12,40 +12,40 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ResponseValidator {
+public class ResponseHelper {
 
     private final Response response;
 
-    public ResponseValidator(Response response) {
+    public ResponseHelper(Response response) {
         this.response = response;
     }
 
-    public ResponseValidator verifyStatusCode(int statusCode) {
+    public ResponseHelper verifyStatusCode(int statusCode) {
         Assert.assertEquals(response.getStatusCode(), statusCode);
         return this;
     }
 
-    public ResponseValidator verifyMessageEquals(String expectedMessage) {
+    public ResponseHelper verifyMessageEquals(String expectedMessage) {
         Assert.assertEquals(getResponseValue(BodyParams.MESSAGE).toString(), expectedMessage);
         return this;
     }
 
-    public ResponseValidator verifyMatchedInternalProductsIdCountEquals(long expectedCount, String message) {
+    public ResponseHelper verifyMatchedInternalProductsIdCountEquals(long expectedCount, String message) {
         Assert.assertEquals(getMatchedInternalProductsIdCount(), expectedCount, message);
         return this;
     }
 
-    public ResponseValidator verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount, String message) {
+    public ResponseHelper verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount, String message) {
         Assert.assertTrue(getMatchedInternalProductsIdCount() <= maxCount, message);
         return this;
     }
 
-    public ResponseValidator verifyMatchedInternalProductsIdCountGreaterThan(long minCount, String message) {
+    public ResponseHelper verifyMatchedInternalProductsIdCountGreaterThan(long minCount, String message) {
         Assert.assertTrue(getMatchedInternalProductsIdCount() > minCount, message);
         return this;
     }
 
-    public ResponseValidator verifyMatchedInternalProductsOrderDifferentFrom(ResponseValidator other, String message) {
+    public ResponseHelper verifyMatchedInternalProductsOrderDifferentFrom(ResponseHelper other, String message) {
         List<String> currentOrder = getMatchedInternalProductIdsInOrder();
         List<String> otherOrder = other.getMatchedInternalProductIdsInOrder();
 
@@ -55,7 +55,7 @@ public class ResponseValidator {
         return this;
     }
 
-    public ResponseValidator verifyFirstMatchedInternalProductNameContains(String expectedSubstring, String message) {
+    public ResponseHelper verifyFirstMatchedInternalProductNameContains(String expectedSubstring, String message) {
         String productName = getFirstMatchedInternalProductName();
         Assert.assertTrue(
                 productName.toLowerCase().contains(expectedSubstring.toLowerCase()),
@@ -64,7 +64,7 @@ public class ResponseValidator {
         return this;
     }
 
-    public ResponseValidator verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring, String message) {
+    public ResponseHelper verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring, String message) {
         String productName = getFirstMatchedInternalProductName();
         Assert.assertFalse(
                 productName.toLowerCase().contains(unexpectedSubstring.toLowerCase()),
@@ -73,7 +73,7 @@ public class ResponseValidator {
         return this;
     }
 
-    public ResponseValidator verifyFirstMatchedInternalProductSimilarityScoreAtLeast(double minScore, String message) {
+    public ResponseHelper verifyFirstMatchedInternalProductSimilarityScoreAtLeast(double minScore, String message) {
         double score = getFirstMatchedInternalProductSimilarityScore();
         Assert.assertTrue(
                 score >= minScore,
@@ -84,6 +84,21 @@ public class ResponseValidator {
 
     public double getFirstMatchedInternalProductSimilarityScoreValue() {
         return getFirstMatchedInternalProductSimilarityScore();
+    }
+
+    public ResponseHelper verifyFirstMatchedInternalProductHasCoreMetadata(String message) {
+        MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
+
+        Assert.assertNotNull(firstProduct.price, message + " Missing field: price");
+        Assert.assertNotNull(firstProduct.sku, message + " Missing field: sku");
+        Assert.assertFalse(firstProduct.sku.isBlank(), message + " Field is blank: sku");
+        Assert.assertNotNull(firstProduct.vendor, message + " Missing field: vendor");
+        Assert.assertFalse(firstProduct.vendor.isBlank(), message + " Field is blank: vendor");
+        Assert.assertNotNull(firstProduct.inStock, message + " Missing field: inStock");
+        Assert.assertNotNull(firstProduct.imageUrl, message + " Missing field: imageUrl");
+        Assert.assertFalse(firstProduct.imageUrl.isBlank(), message + " Field is blank: imageUrl");
+
+        return this;
     }
 
     private <T> T getResponseValue(String param) {

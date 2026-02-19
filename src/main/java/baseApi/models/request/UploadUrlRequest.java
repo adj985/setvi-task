@@ -1,4 +1,4 @@
-package baseApi.model.request;
+package baseApi.models.request;
 
 import com.google.gson.annotations.SerializedName;
 

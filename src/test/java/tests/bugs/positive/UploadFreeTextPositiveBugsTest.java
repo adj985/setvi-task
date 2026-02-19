@@ -1,9 +1,9 @@
 package tests.bugs.positive;
 
 import baseApi.BaseApiTest;
-import baseApi.ResponseValidator;
+import baseApi.ResponseHelper;
 import baseApi.constants.Constants;
-import baseApi.model.request.UploadFreeTextRequest;
+import baseApi.models.request.UploadFreeTextRequest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -20,7 +20,7 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
         UploadFreeTextRequest rankingDisabledRequest = new UploadFreeTextRequest(text, 10, 0.5, false);
         UploadFreeTextRequest rankingEnabledRequest = new UploadFreeTextRequest(text, 10, 0.5, true);
 
-        ResponseValidator rankingDisabledResponse = uploadFreeText(Constants.API_KEY, rankingDisabledRequest)
+        ResponseHelper rankingDisabledResponse = uploadFreeText(Constants.API_KEY, rankingDisabledRequest)
                 .verifyStatusCode(200)
                 .verifyMatchedInternalProductsIdCountGreaterThan(0,
                         "Expected non-empty matches when private label ranking is disabled");
@@ -89,5 +89,21 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
                 "Expected deterministic similarity score variation <= 0.01, but got " + variation
                         + " (attempts: " + scoreAttempt1 + ", " + scoreAttempt2 + ", " + scoreAttempt3 + ")"
         );
+    }
+
+    /**
+     * P5 bug report check.
+     * Matched product should include core commerce metadata fields.
+     */
+    @Test(description = "First matched product should contain price, sku, vendor, inStock and imageUrl")
+    public void uploadFreeTextFirstMatchedProductShouldContainCoreMetadataTest() {
+        UploadFreeTextRequest request = new UploadFreeTextRequest("Cutting Board", 3, 0.5, false);
+
+        uploadFreeText(Constants.API_KEY, request)
+                .verifyStatusCode(200)
+                .verifyMatchedInternalProductsIdCountGreaterThan(0,
+                        "Expected at least one matched product for metadata validation")
+                .verifyFirstMatchedInternalProductHasCoreMetadata(
+                        "Spec mismatch: first matched product should include core metadata fields");
     }
 }
