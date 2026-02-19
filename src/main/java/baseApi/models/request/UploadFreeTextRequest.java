@@ -2,10 +2,7 @@ package baseApi.models.request;
 
 import com.google.gson.annotations.SerializedName;
 
-public record UploadFreeTextRequest(
-        @SerializedName("text") String text,
-        @SerializedName("topK") Integer topK,
-        @SerializedName("threshold") Double threshold,
-        @SerializedName("enablePrivateLabelRanking") Boolean enablePrivateLabelRanking
-) {
+public record UploadFreeTextRequest(@SerializedName("text") String text, @SerializedName("topK") Integer topK,
+		@SerializedName("threshold") Double threshold,
+		@SerializedName("enablePrivateLabelRanking") Boolean enablePrivateLabelRanking) {
 }
