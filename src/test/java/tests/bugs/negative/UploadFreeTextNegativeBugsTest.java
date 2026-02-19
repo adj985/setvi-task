@@ -1,25 +1,22 @@
-package tests;
+package tests.bugs.negative;
 
 import baseApi.BaseApiTest;
-import baseApi.Constants;
-import baseApi.model.UploadFreeTextRequest;
+import baseApi.constants.Constants;
+import baseApi.model.request.UploadFreeTextRequest;
 import org.testng.annotations.Test;
 
-import static baseApi.ErrorMessages.*;
+import static baseApi.constants.ErrorMessages.*;
 
-public class UploadFreeTextTest extends BaseApiTest {
+public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 
     /**
      * N1 bug report check
      */
     @Test(description = " Returns 400 if the text is empty with the appropriate message")
     public void uploadFreeTextEmptyTextTest() {
+        String emptyText = "";
 
-        UploadFreeTextRequest body = new UploadFreeTextRequest()
-                .text("")
-                .topK(3)
-                .threshold(0.5)
-                .enablePrivateLabelRanking(false);
+        UploadFreeTextRequest body = new UploadFreeTextRequest(emptyText, 3, 0.5, false);
 
         uploadFreeText(Constants.API_KEY, body)
                 .verifyStatusCode(400)
@@ -29,13 +26,10 @@ public class UploadFreeTextTest extends BaseApiTest {
 
     @Test(description = "Returns 401 when upload-free-text is called with an invalid API key")
     public void uploadFreeTextUnauthorized() {
-        String invalidApiKey = "a8f9a8f-a9sya9sf78";
+        String invalidApiKey = "invalid_api_key";
+        String someText = "board";
 
-        UploadFreeTextRequest body = new UploadFreeTextRequest()
-                .text("Some text")
-                .topK(3)
-                .threshold(0.5)
-                .enablePrivateLabelRanking(false);
+        UploadFreeTextRequest body = new UploadFreeTextRequest(someText, 3, 0.5, false);
 
         uploadFreeText(invalidApiKey, body)
                 .verifyStatusCode(401);
@@ -48,17 +42,10 @@ public class UploadFreeTextTest extends BaseApiTest {
      */
     @Test(description = "Respects topK value when matching free text products")
     public void uploadFreeTextTopKRespectedTest() {
-        UploadFreeTextRequest bodyTopKOne = new UploadFreeTextRequest()
-                .text("Some text")
-                .topK(1)
-                .threshold(0.5)
-                .enablePrivateLabelRanking(false);
+        String someText = "board";
 
-        UploadFreeTextRequest bodyTopKTen = new UploadFreeTextRequest()
-                .text("Some text")
-                .topK(10)
-                .threshold(0.5)
-                .enablePrivateLabelRanking(false);
+        UploadFreeTextRequest bodyTopKOne = new UploadFreeTextRequest(someText, 1, 0.5, false);
+        UploadFreeTextRequest bodyTopKTen = new UploadFreeTextRequest(someText, 10, 0.5, false);
 
         uploadFreeText(Constants.API_KEY, bodyTopKOne)
                 .verifyStatusCode(200)
@@ -76,25 +63,21 @@ public class UploadFreeTextTest extends BaseApiTest {
      */
     @Test(description = "Handles accents and quotes in free text without returning empty matches")
     public void uploadFreeTextSpecialCharactersShouldStillMatchProductsTest() {
-        UploadFreeTextRequest accentedTextBody = new UploadFreeTextRequest()
-                .text("Café & Restaurant Supplies")
-                .threshold(0.5)
-                .topK(3);
+        String accentedText = "Café & Restaurant Supplies";
+        String quotedMeasurementText = "24\" x 18\" board";
 
-        UploadFreeTextRequest quotedMeasurementBody = new UploadFreeTextRequest()
-                .text("24\" x 18\" board")
-                .threshold(0.5)
-                .topK(3);
+        UploadFreeTextRequest accentedTextBody = new UploadFreeTextRequest(accentedText, 3, 0.5, null);
+        UploadFreeTextRequest quotedMeasurementBody = new UploadFreeTextRequest(quotedMeasurementText, 3, 0.5, null);
 
         uploadFreeText(Constants.API_KEY, accentedTextBody)
                 .verifyStatusCode(200)
                 .verifyMatchedInternalProductsIdCountGreaterThan(0,
-                        "Expected non-empty matches for accent-insensitive text: 'Café & Restaurant Supplies'");
+                        "Expected non-empty matches for accent-insensitive text: '" + accentedText + "'");
 
         uploadFreeText(Constants.API_KEY, quotedMeasurementBody)
                 .verifyStatusCode(200)
                 .verifyMatchedInternalProductsIdCountGreaterThan(0,
-                        "Expected non-empty matches for quoted measurement text: '24\" x 18\" board'");
+                        "Expected non-empty matches for quoted measurement text: '" + quotedMeasurementText + "'");
     }
 
 }

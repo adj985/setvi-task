@@ -1,4 +1,4 @@
-package baseApi;
+package baseApi.constants;
 
 public class BodyParams {
 

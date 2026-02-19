@@ -1,11 +1,15 @@
 package baseApi;
 
+import baseApi.constants.BodyParams;
+import baseApi.constants.ItemsPath;
+import baseApi.model.response.MatchedInternalProductResponse;
+import baseApi.model.response.MatchedItemResponse;
 import io.restassured.response.Response;
 import org.testng.Assert;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ResponseValidator {
 
@@ -13,7 +17,6 @@ public class ResponseValidator {
 
     public ResponseValidator(Response response) {
         this.response = response;
-        printResponseBody();
     }
 
     public ResponseValidator verifyStatusCode(int statusCode) {
@@ -41,43 +44,106 @@ public class ResponseValidator {
         return this;
     }
 
-    private Object getResponseValue(String param) {
+    public ResponseValidator verifyMatchedInternalProductsOrderDifferentFrom(ResponseValidator other, String message) {
+        List<String> currentOrder = getMatchedInternalProductIdsInOrder();
+        List<String> otherOrder = other.getMatchedInternalProductIdsInOrder();
+
+        Assert.assertFalse(currentOrder.isEmpty() && otherOrder.isEmpty(),
+                "Both responses returned empty matched product IDs. " + message);
+        Assert.assertNotEquals(currentOrder, otherOrder, message);
+        return this;
+    }
+
+    public ResponseValidator verifyFirstMatchedInternalProductNameContains(String expectedSubstring, String message) {
+        String productName = getFirstMatchedInternalProductName();
+        Assert.assertTrue(
+                productName.toLowerCase().contains(expectedSubstring.toLowerCase()),
+                message + ". First product name: '" + productName + "'"
+        );
+        return this;
+    }
+
+    public ResponseValidator verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring, String message) {
+        String productName = getFirstMatchedInternalProductName();
+        Assert.assertFalse(
+                productName.toLowerCase().contains(unexpectedSubstring.toLowerCase()),
+                message + ". First product name: '" + productName + "'"
+        );
+        return this;
+    }
+
+    public ResponseValidator verifyFirstMatchedInternalProductSimilarityScoreAtLeast(double minScore, String message) {
+        double score = getFirstMatchedInternalProductSimilarityScore();
+        Assert.assertTrue(
+                score >= minScore,
+                message + ". First product similarityScore: " + score
+        );
+        return this;
+    }
+
+    public double getFirstMatchedInternalProductSimilarityScoreValue() {
+        return getFirstMatchedInternalProductSimilarityScore();
+    }
+
+    private <T> T getResponseValue(String param) {
         return response.jsonPath().get(param);
     }
 
     private long getMatchedInternalProductsIdCount() {
-        List<Map<String, Object>> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
+        List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
         return matchedInternalProducts.stream()
-                .filter(product -> product.get("_id") != null)
+                .filter(product -> product._id != null)
                 .count();
     }
 
-    private List<Map<String, Object>> getMatchedInternalProductsFromFirstResultItem() {
-        Map<String, Object> firstMatchedItem = getFirstResultItem("result.matchedItems");
-        if (firstMatchedItem != null) {
-            return getMatchedInternalProducts(firstMatchedItem);
-        }
-
-        Map<String, Object> firstNotMatchedItem = getFirstResultItem("result.notMatchedItems");
-        if (firstNotMatchedItem != null) {
-            return getMatchedInternalProducts(firstNotMatchedItem);
-        }
-
-        Assert.fail("Could not find matchedItems/notMatchedItems in response");
-        return Collections.emptyList();
+    private List<String> getMatchedInternalProductIdsInOrder() {
+        List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
+        return matchedInternalProducts.stream()
+                .map(product -> product._id)
+                .filter(id -> id != null)
+                .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Map<String, Object>> getMatchedInternalProducts(Map<String, Object> item) {
-        Object matchedInternalProducts = item.get("matchedInternalProducts");
-        if (matchedInternalProducts == null) {
+    private MatchedInternalProductResponse getFirstMatchedInternalProduct() {
+        List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
+        Assert.assertFalse(matchedInternalProducts.isEmpty(), "No matchedInternalProducts found in first matched item");
+        return matchedInternalProducts.getFirst();
+    }
+
+    private String getFirstMatchedInternalProductName() {
+        MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
+        String productName = firstProduct.productName;
+        if (productName == null) {
+            productName = firstProduct.name;
+        }
+        Assert.assertNotNull(productName,
+                "Spec mismatch: first matched product does not contain '" + ItemsPath.PRODUCT_NAME + "' or '"
+                        + ItemsPath.NAME + "'.");
+        return productName;
+    }
+
+    private double getFirstMatchedInternalProductSimilarityScore() {
+        MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
+        Double similarityScore = firstProduct.similarityScore;
+        Assert.assertNotNull(firstProduct.similarityScore,
+                "Spec mismatch: first matched product does not contain '" + ItemsPath.SIMILARITY_SCORE + "'.");
+        return similarityScore;
+    }
+
+    private List<MatchedInternalProductResponse> getMatchedInternalProductsFromFirstResultItem() {
+        MatchedItemResponse firstMatchedItem = getFirstResultItem(ItemsPath.MATCHED_ITEMS, MatchedItemResponse.class);
+        if (firstMatchedItem == null) {
+            Assert.fail("Could not find matchedItems in response");
             return Collections.emptyList();
         }
-        return (List<Map<String, Object>>) matchedInternalProducts;
+        if (firstMatchedItem.matchedInternalProducts == null) {
+            return Collections.emptyList();
+        }
+        return firstMatchedItem.matchedInternalProducts;
     }
 
-    private Map<String, Object> getFirstResultItem(String itemsPath) {
-        List<Map<String, Object>> items = response.jsonPath().getList(itemsPath);
+    private <T> T getFirstResultItem(String itemsPath, Class<T> itemClass) {
+        List<T> items = response.jsonPath().getList(itemsPath, itemClass);
         if (items == null || items.isEmpty()) {
             return null;
         }

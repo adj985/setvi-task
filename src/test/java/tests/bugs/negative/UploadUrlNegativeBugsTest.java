@@ -1,13 +1,13 @@
-package tests;
+package tests.bugs.negative;
 
 import baseApi.BaseApiTest;
-import baseApi.Constants;
-import baseApi.model.UploadUrlRequest;
+import baseApi.constants.Constants;
+import baseApi.model.request.UploadUrlRequest;
 import org.testng.annotations.Test;
 
-import static baseApi.ErrorMessages.PLEASE_PROVIDE_VALID_URL;
+import static baseApi.constants.ErrorMessages.PLEASE_PROVIDE_VALID_URL;
 
-public class UploadUrlTest extends BaseApiTest {
+public class UploadUrlNegativeBugsTest extends BaseApiTest {
 
     /**
      * N2 bug report check
@@ -17,10 +17,7 @@ public class UploadUrlTest extends BaseApiTest {
     public void uploadUrlInvalidUrlTest() {
         String invalidUrl = "setvi.com";
 
-        UploadUrlRequest body = new UploadUrlRequest()
-                .url(invalidUrl)
-                .topK(3)
-                .threshold(0.5);
+        UploadUrlRequest body = new UploadUrlRequest(invalidUrl, 3, 0.5);
 
         uploadUrl(Constants.API_KEY, body)
                 .verifyStatusCode(400)
@@ -31,10 +28,7 @@ public class UploadUrlTest extends BaseApiTest {
     public void uploadUrlValidUrlTest() {
         String validUrl = "https://www.setvi.com";
 
-        UploadUrlRequest body = new UploadUrlRequest()
-                .url(validUrl)
-                .topK(3)
-                .threshold(0.5);
+        UploadUrlRequest body = new UploadUrlRequest(validUrl, 3, 0.5);
 
         uploadUrl(Constants.API_KEY, body)
                 .verifyStatusCode(200);
@@ -48,15 +42,9 @@ public class UploadUrlTest extends BaseApiTest {
     public void uploadUrlTopKRespectedTest() {
         String validUrl = "https://www.webstaurantstore.com/search/container.html";
 
-        UploadUrlRequest bodyTopKOne = new UploadUrlRequest()
-                .url(validUrl)
-                .topK(1)
-                .threshold(0.5);
+        UploadUrlRequest bodyTopKOne = new UploadUrlRequest(validUrl, 1, 0.5);
 
-        UploadUrlRequest bodyTopKTen = new UploadUrlRequest()
-                .url(validUrl)
-                .topK(10)
-                .threshold(0.5);
+        UploadUrlRequest bodyTopKTen = new UploadUrlRequest(validUrl, 10, 0.5);
 
         uploadUrl(Constants.API_KEY, bodyTopKOne)
                 .verifyStatusCode(200)
