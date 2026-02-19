@@ -1,5 +1,7 @@
 package baseApi.models.response;
 
+import java.util.List;
+
 public class MatchedInternalProductResponse {
 
     public String _id;
@@ -9,7 +11,9 @@ public class MatchedInternalProductResponse {
     public Double similarityScore;
     public Double price;
     public String sku;
-    public String vendor;
+    public Object vendor;
     public Boolean inStock;
     public String imageUrl;
+    public List<ProductImageResponse> images;
+    public Integer percentage;
 }

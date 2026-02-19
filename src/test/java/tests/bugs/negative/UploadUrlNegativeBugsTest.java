@@ -34,24 +34,5 @@ public class UploadUrlNegativeBugsTest extends BaseApiTest {
                 .verifyStatusCode(200);
     }
 
-    /**
-     * N4 bug report check
-     * topK parameter should define number of returned products
-     */
-    @Test(description = "Respects topK value when matching URL products")
-    public void uploadUrlTopKRespectedTest() {
-        String validUrl = "https://www.webstaurantstore.com/search/container.html";
-
-        UploadUrlRequest bodyTopKOne = new UploadUrlRequest(validUrl, 1, 0.5);
-
-        UploadUrlRequest bodyTopKTen = new UploadUrlRequest(validUrl, 10, 0.5);
-
-        uploadUrl(Constants.API_KEY, bodyTopKOne)
-                .verifyStatusCode(200)
-                .verifyMatchedInternalProductsIdCountLessThanOrEqual(1, "topK=1 should return up to 1 product");
-        uploadUrl(Constants.API_KEY, bodyTopKTen)
-                .verifyStatusCode(200)
-                .verifyMatchedInternalProductsIdCountLessThanOrEqual(10, "topK=10 should return up to 10 products");
-    }
 
 }

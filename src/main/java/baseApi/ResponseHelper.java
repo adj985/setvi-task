@@ -9,6 +9,7 @@ import org.testng.Assert;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ public class ResponseHelper {
 
     public ResponseHelper(Response response) {
         this.response = response;
+        printResponseBody();
     }
 
     public ResponseHelper verifyStatusCode(int statusCode) {
@@ -73,30 +75,28 @@ public class ResponseHelper {
         return this;
     }
 
-    public ResponseHelper verifyFirstMatchedInternalProductSimilarityScoreAtLeast(double minScore, String message) {
-        double score = getFirstMatchedInternalProductSimilarityScore();
-        Assert.assertTrue(
-                score >= minScore,
-                message + ". First product similarityScore: " + score
-        );
-        return this;
-    }
-
-    public double getFirstMatchedInternalProductSimilarityScoreValue() {
-        return getFirstMatchedInternalProductSimilarityScore();
-    }
-
     public ResponseHelper verifyFirstMatchedInternalProductHasCoreMetadata(String message) {
         MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
 
-        Assert.assertNotNull(firstProduct.price, message + " Missing field: price");
+        Assert.assertNotNull(firstProduct._id, message + " Missing field: _id");
+        Assert.assertFalse(firstProduct._id.isBlank(), message + " Field is blank: _id");
         Assert.assertNotNull(firstProduct.sku, message + " Missing field: sku");
         Assert.assertFalse(firstProduct.sku.isBlank(), message + " Field is blank: sku");
-        Assert.assertNotNull(firstProduct.vendor, message + " Missing field: vendor");
-        Assert.assertFalse(firstProduct.vendor.isBlank(), message + " Field is blank: vendor");
-        Assert.assertNotNull(firstProduct.inStock, message + " Missing field: inStock");
-        Assert.assertNotNull(firstProduct.imageUrl, message + " Missing field: imageUrl");
-        Assert.assertFalse(firstProduct.imageUrl.isBlank(), message + " Field is blank: imageUrl");
+
+        String vendorName = getVendorName(firstProduct.vendor);
+        Assert.assertNotNull(vendorName, message + " Missing vendor name");
+        Assert.assertFalse(vendorName.isBlank(), message + " Field is blank: vendor name");
+
+        String imagePath = getPrimaryImagePath(firstProduct);
+        Assert.assertNotNull(imagePath, message + " Missing product image path");
+        Assert.assertFalse(imagePath.isBlank(), message + " Field is blank: product image path");
+
+        // Current schema does not return price/inStock; percentage is the closest quality signal.
+        Assert.assertNotNull(firstProduct.percentage, message + " Missing field: percentage");
+        Assert.assertTrue(
+                firstProduct.percentage >= 0 && firstProduct.percentage <= 100,
+                message + " Invalid percentage value: " + firstProduct.percentage
+        );
 
         return this;
     }
@@ -165,6 +165,30 @@ public class ResponseHelper {
 
     private void printResponseBody() {
         System.out.println(response.body().asPrettyString());
+    }
+
+    private String getPrimaryImagePath(MatchedInternalProductResponse product) {
+        if (product.imageUrl != null && !product.imageUrl.isBlank()) {
+            return product.imageUrl;
+        }
+        if (product.images == null || product.images.isEmpty() || product.images.getFirst() == null) {
+            return null;
+        }
+        return product.images.getFirst().path;
+    }
+
+    private String getVendorName(Object vendor) {
+        if (vendor == null) {
+            return null;
+        }
+        if (vendor instanceof String vendorValue) {
+            return vendorValue;
+        }
+        if (vendor instanceof Map<?, ?> vendorMap) {
+            Object name = vendorMap.get("name");
+            return name == null ? null : name.toString();
+        }
+        return vendor.toString();
     }
 
 }

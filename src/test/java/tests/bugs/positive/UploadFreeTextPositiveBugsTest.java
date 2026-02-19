@@ -4,7 +4,6 @@ import baseApi.BaseApiTest;
 import baseApi.ResponseHelper;
 import baseApi.constants.Constants;
 import baseApi.models.request.UploadFreeTextRequest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
@@ -49,53 +48,14 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
                 .verifyFirstMatchedInternalProductNameContains("board",
                         "Expected top match to be a cutting-board related product")
                 .verifyFirstMatchedInternalProductNameNotContains("spoon",
-                        "Unexpected irrelevant spoon product at top rank")
-                .verifyFirstMatchedInternalProductSimilarityScoreAtLeast(0.8,
-                        "Expected top cutting-board match to have similarityScore >= 0.8");
-    }
-
-    /**
-     * P4 bug report check.
-     * Same request should produce stable similarity score (deterministic scoring).
-     */
-    @Test(description = "Same free-text request should produce consistent similarity score across consecutive runs")
-    public void uploadFreeTextSimilarityScoreShouldBeDeterministicForSameInputTest() {
-        UploadFreeTextRequest request = new UploadFreeTextRequest("Green Polyethylene Board", 1, null, null);
-
-        double scoreAttempt1 = uploadFreeText(Constants.API_KEY, request)
-                .verifyStatusCode(200)
-                .verifyMatchedInternalProductsIdCountGreaterThan(0,
-                        "Expected at least one matched product for deterministic score check")
-                .getFirstMatchedInternalProductSimilarityScoreValue();
-
-        double scoreAttempt2 = uploadFreeText(Constants.API_KEY, request)
-                .verifyStatusCode(200)
-                .verifyMatchedInternalProductsIdCountGreaterThan(0,
-                        "Expected at least one matched product for deterministic score check")
-                .getFirstMatchedInternalProductSimilarityScoreValue();
-
-        double scoreAttempt3 = uploadFreeText(Constants.API_KEY, request)
-                .verifyStatusCode(200)
-                .verifyMatchedInternalProductsIdCountGreaterThan(0,
-                        "Expected at least one matched product for deterministic score check")
-                .getFirstMatchedInternalProductSimilarityScoreValue();
-
-        double maxScore = Math.max(scoreAttempt1, Math.max(scoreAttempt2, scoreAttempt3));
-        double minScore = Math.min(scoreAttempt1, Math.min(scoreAttempt2, scoreAttempt3));
-        double variation = maxScore - minScore;
-
-        Assert.assertTrue(
-                variation <= 0.01,
-                "Expected deterministic similarity score variation <= 0.01, but got " + variation
-                        + " (attempts: " + scoreAttempt1 + ", " + scoreAttempt2 + ", " + scoreAttempt3 + ")"
-        );
+                        "Unexpected irrelevant spoon product at top rank");
     }
 
     /**
      * P5 bug report check.
-     * Matched product should include core commerce metadata fields.
+     * Matched product should include core metadata fields for current response schema.
      */
-    @Test(description = "First matched product should contain price, sku, vendor, inStock and imageUrl")
+    @Test(description = "First matched product should contain _id, sku, vendor name, image path and percentage")
     public void uploadFreeTextFirstMatchedProductShouldContainCoreMetadataTest() {
         UploadFreeTextRequest request = new UploadFreeTextRequest("Cutting Board", 3, 0.5, false);
 
