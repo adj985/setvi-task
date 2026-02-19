@@ -161,14 +161,6 @@ public class ResponseHelper {
         return productName;
     }
 
-    private double getFirstMatchedInternalProductSimilarityScore() {
-        MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
-        Double similarityScore = firstProduct.similarityScore;
-        Assert.assertNotNull(firstProduct.similarityScore,
-                "Spec mismatch: first matched product does not contain '" + ItemsPath.SIMILARITY_SCORE + "'.");
-        return similarityScore;
-    }
-
     private List<MatchedInternalProductResponse> getMatchedInternalProductsFromFirstResultItem() {
         List<MatchedItemResponse> matchedItems = getMatchedItems();
         if (matchedItems.isEmpty()) {
