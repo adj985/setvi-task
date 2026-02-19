@@ -170,20 +170,19 @@ public class ResponseHelper {
     }
 
     private List<MatchedInternalProductResponse> getMatchedInternalProductsFromFirstResultItem() {
-        MatchedItemResponse firstMatchedItem = getFirstResultItem(ItemsPath.MATCHED_ITEMS, MatchedItemResponse.class);
-        if (firstMatchedItem == null) {
+        List<MatchedItemResponse> matchedItems = getMatchedItems();
+        if (matchedItems.isEmpty()) {
             Assert.fail("Could not find matchedItems in response");
             return Collections.emptyList();
         }
+        MatchedItemResponse firstMatchedItem = matchedItems.getFirst();
         return Objects.requireNonNullElse(firstMatchedItem.matchedInternalProducts, Collections.emptyList());
     }
 
-    private <T> T getFirstResultItem(String itemsPath, Class<T> itemClass) {
-        List<T> items = response.jsonPath().getList(itemsPath, itemClass);
-        if (items == null || items.isEmpty()) {
-            return null;
-        }
-        return items.getFirst();
+    private List<MatchedItemResponse> getMatchedItems() {
+        List<MatchedItemResponse> matchedItems = response.jsonPath()
+                .getList(ItemsPath.MATCHED_ITEMS, MatchedItemResponse.class);
+        return Objects.requireNonNullElse(matchedItems, Collections.emptyList());
     }
 
     private void printResponseBody() {
@@ -201,17 +200,15 @@ public class ResponseHelper {
     }
 
     private String getVendorName(Object vendor) {
-        if (vendor == null) {
-            return null;
-        }
-        if (vendor instanceof String vendorValue) {
-            return vendorValue;
-        }
-        if (vendor instanceof Map<?, ?> vendorMap) {
-            Object name = vendorMap.get("name");
-            return name == null ? null : name.toString();
-        }
-        return vendor.toString();
+        return switch (vendor) {
+            case null -> null;
+            case String vendorValue -> vendorValue;
+            case Map<?, ?> vendorMap -> {
+                Object name = vendorMap.get("name");
+                yield name == null ? null : name.toString();
+            }
+            default -> vendor.toString();
+        };
     }
 
 }
