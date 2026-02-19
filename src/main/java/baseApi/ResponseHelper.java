@@ -1,6 +1,5 @@
 package baseApi;
 
-import baseApi.constants.BodyParams;
 import baseApi.constants.ItemsPath;
 import baseApi.models.response.MatchedInternalProductResponse;
 import baseApi.models.response.MatchedItemResponse;
@@ -15,6 +14,13 @@ import java.util.stream.Collectors;
 
 public class ResponseHelper {
 
+    private static final String[] MESSAGE_PATHS = {
+            "Message",
+            "message",
+            "error.message",
+            "errors[0].message"
+    };
+
     private final Response response;
 
     public ResponseHelper(Response response) {
@@ -28,7 +34,18 @@ public class ResponseHelper {
     }
 
     public ResponseHelper verifyMessageEquals(String expectedMessage) {
-        Assert.assertEquals(getMessage(), expectedMessage);
+        String actualMessage = getMessage();
+        String responseBody = response.body().asString();
+
+        Assert.assertNotNull(
+                actualMessage,
+                "Could not extract message from response using known paths. Response body: " + responseBody
+        );
+        Assert.assertEquals(
+                actualMessage,
+                expectedMessage,
+                "Unexpected error message. Response body: " + responseBody
+        );
         return this;
     }
 
@@ -102,7 +119,13 @@ public class ResponseHelper {
     }
 
     private String getMessage() {
-        return response.jsonPath().get(BodyParams.MESSAGE);
+        for (String path : MESSAGE_PATHS) {
+            String value = response.jsonPath().getString(path);
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
     }
 
     private long getMatchedInternalProductsIdCount() {
