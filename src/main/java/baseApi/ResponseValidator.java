@@ -9,6 +9,7 @@ import org.testng.Assert;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ResponseValidator {
@@ -100,7 +101,7 @@ public class ResponseValidator {
         List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
         return matchedInternalProducts.stream()
                 .map(product -> product._id)
-                .filter(id -> id != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -136,10 +137,7 @@ public class ResponseValidator {
             Assert.fail("Could not find matchedItems in response");
             return Collections.emptyList();
         }
-        if (firstMatchedItem.matchedInternalProducts == null) {
-            return Collections.emptyList();
-        }
-        return firstMatchedItem.matchedInternalProducts;
+        return Objects.requireNonNullElse(firstMatchedItem.matchedInternalProducts, Collections.emptyList());
     }
 
     private <T> T getFirstResultItem(String itemsPath, Class<T> itemClass) {
