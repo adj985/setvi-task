@@ -19,7 +19,7 @@ public class ResponseHelper {
 
     public ResponseHelper(Response response) {
         this.response = response;
-        printResponseBody();
+//        printResponseBody();
     }
 
     public ResponseHelper verifyStatusCode(int statusCode) {
@@ -28,7 +28,7 @@ public class ResponseHelper {
     }
 
     public ResponseHelper verifyMessageEquals(String expectedMessage) {
-        Assert.assertEquals(getResponseValue(BodyParams.MESSAGE).toString(), expectedMessage);
+        Assert.assertEquals(getMessage(), expectedMessage);
         return this;
     }
 
@@ -101,8 +101,8 @@ public class ResponseHelper {
         return this;
     }
 
-    private <T> T getResponseValue(String param) {
-        return response.jsonPath().get(param);
+    private String getMessage() {
+        return response.jsonPath().get(BodyParams.MESSAGE);
     }
 
     private long getMatchedInternalProductsIdCount() {
