@@ -22,6 +22,9 @@ public class UploadUrlNegativeBugsTest extends BaseApiTest {
 		uploadUrl(Constants.API_KEY, body).verifyStatusCode(400).verifyMessageEquals(PLEASE_PROVIDE_VALID_URL);
 	}
 
+	/**
+	 * N2 bug report check positive case
+	 */
 	@Test(description = "Returns 200 if the url is valid")
 	public void uploadUrlValidUrlTest() {
 		String validUrl = "https://www.setvi.com";

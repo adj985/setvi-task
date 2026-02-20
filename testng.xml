@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="All Test Suite">
+<suite name="All Test Suite" parallel="classes" thread-count="6" data-provider-thread-count="6">
     <test verbose="2" name="C:/Users/adj98/Documents/IdeaProjects/setvi-task">
         <packages>
             <package name="tests.*"/>

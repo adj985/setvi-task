@@ -23,6 +23,10 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 
 	}
 
+	/**
+	 * Just an additional check
+	 * Turns out api does not behave properly, at least in this env
+	 */
 	@Test(description = "Returns 401 when upload-free-text is called with an invalid API key")
 	public void uploadFreeTextUnauthorized() {
 		String invalidApiKey = "invalid_api_key";
