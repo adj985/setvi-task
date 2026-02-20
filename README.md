@@ -56,7 +56,7 @@ mvn "-Dtest=tests.bugs.positive.UploadFreeTextPositiveBugsTest#uploadFreeTextFir
 
 After execution, open:
 
-- `target/surefire-reports/index.html`
+- `target/surefire-reports/index.html` by using right click > Open in > Browser > Chrome or else
 
 Additional useful report files:
 
