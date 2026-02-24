@@ -30,7 +30,8 @@ public class ResponseHelper {
 
 	public ResponseHelper verifyMessageEquals(String expectedMessage) {
 		String actualMessage = getMessage();
-		String responseBody = response.body().asString();
+		String responseBody = response.body()
+				.asString();
 
 		Assert.assertNotNull(actualMessage,
 				String.format("Could not extract message from response using known paths. Response body: %s",
@@ -71,7 +72,8 @@ public class ResponseHelper {
 
 	public ResponseHelper verifyFirstMatchedInternalProductNameContains(String expectedSubstring) {
 		String productName = getFirstMatchedInternalProductName();
-		Assert.assertTrue(productName.toLowerCase().contains(expectedSubstring.toLowerCase()),
+		Assert.assertTrue(productName.toLowerCase()
+				.contains(expectedSubstring.toLowerCase()),
 				String.format("Expected first matched product name to contain '%s'. First product name: '%s'",
 						expectedSubstring, productName));
 		return this;
@@ -79,7 +81,8 @@ public class ResponseHelper {
 
 	public ResponseHelper verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring) {
 		String productName = getFirstMatchedInternalProductName();
-		Assert.assertFalse(productName.toLowerCase().contains(unexpectedSubstring.toLowerCase()),
+		Assert.assertFalse(productName.toLowerCase()
+				.contains(unexpectedSubstring.toLowerCase()),
 				String.format("Expected first matched product name not to contain '%s'. First product name: '%s'",
 						unexpectedSubstring, productName));
 		return this;
@@ -112,7 +115,8 @@ public class ResponseHelper {
 
 	private String getMessage() {
 		for (String path : MESSAGE_PATHS) {
-			String value = response.jsonPath().getString(path);
+			String value = response.jsonPath()
+					.getString(path);
 			if (value != null && !value.isBlank()) {
 				return value;
 			}
@@ -122,12 +126,16 @@ public class ResponseHelper {
 
 	private long getMatchedInternalProductsIdCount() {
 		List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
-		return matchedInternalProducts.stream().filter(product -> product._id != null).count();
+		return matchedInternalProducts.stream()
+				.filter(product -> product._id != null)
+				.count();
 	}
 
 	private List<String> getMatchedInternalProductIdsInOrder() {
 		List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
-		return matchedInternalProducts.stream().map(product -> product._id).filter(Objects::nonNull)
+		return matchedInternalProducts.stream()
+				.map(product -> product._id)
+				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 	}
 
@@ -160,7 +168,8 @@ public class ResponseHelper {
 	}
 
 	private List<MatchedItemResponse> getMatchedItems() {
-		List<MatchedItemResponse> matchedItems = response.jsonPath().getList(ItemsPath.MATCHED_ITEMS,
+		List<MatchedItemResponse> matchedItems = response.jsonPath()
+				.getList(ItemsPath.MATCHED_ITEMS,
 				MatchedItemResponse.class);
 		return Objects.requireNonNullElse(matchedItems, Collections.emptyList());
 	}

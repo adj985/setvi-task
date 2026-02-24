@@ -20,9 +20,11 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
 		UploadFreeTextRequest rankingEnabledRequest = new UploadFreeTextRequest(text, 10, 0.5, true);
 
 		ResponseHelper rankingDisabledResponse = uploadFreeText(Constants.API_KEY, rankingDisabledRequest)
-				.verifyStatusCode(200).verifyMatchedInternalProductsIdCountGreaterThan(0);
+				.verifyStatusCode(200)
+				.verifyMatchedInternalProductsIdCountGreaterThan(0);
 
-		uploadFreeText(Constants.API_KEY, rankingEnabledRequest).verifyStatusCode(200)
+		uploadFreeText(Constants.API_KEY, rankingEnabledRequest)
+				.verifyStatusCode(200)
 				.verifyMatchedInternalProductsIdCountGreaterThan(0)
 				.verifyMatchedInternalProductsOrderDifferentFrom(rankingDisabledResponse);
 	}
@@ -36,8 +38,10 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
 		String text = "Plastic Cutting Board 24x18";
 		UploadFreeTextRequest request = new UploadFreeTextRequest(text, 3, 0.5, false);
 
-		uploadFreeText(Constants.API_KEY, request).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0).verifyFirstMatchedInternalProductNameContains("board")
+		uploadFreeText(Constants.API_KEY, request)
+				.verifyStatusCode(200)
+				.verifyMatchedInternalProductsIdCountGreaterThan(0)
+				.verifyFirstMatchedInternalProductNameContains("board")
 				.verifyFirstMatchedInternalProductNameNotContains("spoon");
 	}
 
@@ -49,7 +53,9 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
 	public void uploadFreeTextFirstMatchedProductShouldContainCoreMetadataTest() {
 		UploadFreeTextRequest request = new UploadFreeTextRequest("Cutting Board", 3, 0.5, false);
 
-		uploadFreeText(Constants.API_KEY, request).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0).verifyFirstMatchedInternalProductHasCoreMetadata();
+		uploadFreeText(Constants.API_KEY, request)
+				.verifyStatusCode(200)
+				.verifyMatchedInternalProductsIdCountGreaterThan(0)
+				.verifyFirstMatchedInternalProductHasCoreMetadata();
 	}
 }

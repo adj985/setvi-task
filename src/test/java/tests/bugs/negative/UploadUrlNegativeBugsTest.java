@@ -19,7 +19,9 @@ public class UploadUrlNegativeBugsTest extends BaseApiTest {
 
 		UploadUrlRequest body = new UploadUrlRequest(invalidUrl, 3, 0.5);
 
-		uploadUrl(Constants.API_KEY, body).verifyStatusCode(400).verifyMessageEquals(PLEASE_PROVIDE_VALID_URL);
+		uploadUrl(Constants.API_KEY, body)
+				.verifyStatusCode(400)
+				.verifyMessageEquals(PLEASE_PROVIDE_VALID_URL);
 	}
 
 	/**
@@ -31,7 +33,8 @@ public class UploadUrlNegativeBugsTest extends BaseApiTest {
 
 		UploadUrlRequest body = new UploadUrlRequest(validUrl, 3, 0.5);
 
-		uploadUrl(Constants.API_KEY, body).verifyStatusCode(200);
+		uploadUrl(Constants.API_KEY, body)
+				.verifyStatusCode(200);
 	}
 
 }

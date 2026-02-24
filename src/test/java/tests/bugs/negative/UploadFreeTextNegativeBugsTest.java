@@ -18,7 +18,8 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 
 		UploadFreeTextRequest body = new UploadFreeTextRequest(emptyText, 3, 0.5, false);
 
-		uploadFreeText(Constants.API_KEY, body).verifyStatusCode(400)
+		uploadFreeText(Constants.API_KEY, body)
+				.verifyStatusCode(400)
 				.verifyMessageEquals(MUST_NOT_BE_NULL_OR_WHITESPACE);
 
 	}
@@ -34,7 +35,8 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 
 		UploadFreeTextRequest body = new UploadFreeTextRequest(someText, 3, 0.5, false);
 
-		uploadFreeText(invalidApiKey, body).verifyStatusCode(401);
+		uploadFreeText(invalidApiKey, body)
+				.verifyStatusCode(401);
 
 	}
 
@@ -48,9 +50,11 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 		UploadFreeTextRequest bodyTopKOne = new UploadFreeTextRequest(someText, 1, 0.5, false);
 		UploadFreeTextRequest bodyTopKTen = new UploadFreeTextRequest(someText, 10, 0.5, false);
 
-		uploadFreeText(Constants.API_KEY, bodyTopKOne).verifyStatusCode(200)
+		uploadFreeText(Constants.API_KEY, bodyTopKOne)
+				.verifyStatusCode(200)
 				.verifyMatchedInternalProductsIdCountEquals(1);
-		uploadFreeText(Constants.API_KEY, bodyTopKTen).verifyStatusCode(200)
+		uploadFreeText(Constants.API_KEY, bodyTopKTen)
+				.verifyStatusCode(200)
 				.verifyMatchedInternalProductsIdCountLessThanOrEqual(10);
 	}
 
@@ -65,10 +69,12 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 		UploadFreeTextRequest accentedTextBody = new UploadFreeTextRequest(accentedText, 3, 0.5, null);
 		UploadFreeTextRequest quotedMeasurementBody = new UploadFreeTextRequest(quotedMeasurementText, 3, 0.5, null);
 
-		uploadFreeText(Constants.API_KEY, accentedTextBody).verifyStatusCode(200)
+		uploadFreeText(Constants.API_KEY, accentedTextBody)
+				.verifyStatusCode(200)
 				.verifyMatchedInternalProductsIdCountGreaterThan(0);
 
-		uploadFreeText(Constants.API_KEY, quotedMeasurementBody).verifyStatusCode(200)
+		uploadFreeText(Constants.API_KEY, quotedMeasurementBody)
+				.verifyStatusCode(200)
 				.verifyMatchedInternalProductsIdCountGreaterThan(0);
 	}
 
