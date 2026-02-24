@@ -33,26 +33,28 @@ public class ResponseHelper {
 		String responseBody = response.body().asString();
 
 		Assert.assertNotNull(actualMessage,
-				"Could not extract message from response using known paths. Response body: " + responseBody);
-		Assert.assertEquals(actualMessage, expectedMessage, "Unexpected error message. Response body: " + responseBody);
+				String.format("Could not extract message from response using known paths. Response body: %s",
+						responseBody));
+		Assert.assertEquals(actualMessage, expectedMessage,
+				String.format("Unexpected error message. Response body: %s", responseBody));
 		return this;
 	}
 
 	public ResponseHelper verifyMatchedInternalProductsIdCountEquals(long expectedCount) {
 		Assert.assertEquals(getMatchedInternalProductsIdCount(), expectedCount,
-				"Expected matchedInternalProducts id count to equal " + expectedCount);
+				String.format("Expected matchedInternalProducts id count to equal %d", expectedCount));
 		return this;
 	}
 
 	public ResponseHelper verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount) {
 		Assert.assertTrue(getMatchedInternalProductsIdCount() <= maxCount,
-				"Expected matchedInternalProducts id count to be <= " + maxCount);
+				String.format("Expected matchedInternalProducts id count to be <= %d", maxCount));
 		return this;
 	}
 
 	public ResponseHelper verifyMatchedInternalProductsIdCountGreaterThan(long minCount) {
 		Assert.assertTrue(getMatchedInternalProductsIdCount() > minCount,
-				"Expected matchedInternalProducts id count to be > " + minCount);
+				String.format("Expected matchedInternalProducts id count to be > %d", minCount));
 		return this;
 	}
 
@@ -70,16 +72,16 @@ public class ResponseHelper {
 	public ResponseHelper verifyFirstMatchedInternalProductNameContains(String expectedSubstring) {
 		String productName = getFirstMatchedInternalProductName();
 		Assert.assertTrue(productName.toLowerCase().contains(expectedSubstring.toLowerCase()),
-				"Expected first matched product name to contain '" + expectedSubstring + "'. First product name: '"
-						+ productName + "'");
+				String.format("Expected first matched product name to contain '%s'. First product name: '%s'",
+						expectedSubstring, productName));
 		return this;
 	}
 
 	public ResponseHelper verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring) {
 		String productName = getFirstMatchedInternalProductName();
 		Assert.assertFalse(productName.toLowerCase().contains(unexpectedSubstring.toLowerCase()),
-				"Expected first matched product name not to contain '" + unexpectedSubstring
-						+ "'. First product name: '" + productName + "'");
+				String.format("Expected first matched product name not to contain '%s'. First product name: '%s'",
+						unexpectedSubstring, productName));
 		return this;
 	}
 
@@ -103,7 +105,7 @@ public class ResponseHelper {
 		// quality signal.
 		Assert.assertNotNull(firstProduct.percentage, "Missing field: percentage");
 		Assert.assertTrue(firstProduct.percentage >= 0 && firstProduct.percentage <= 100,
-				"Invalid percentage value: " + firstProduct.percentage);
+				String.format("Invalid percentage value: %s", firstProduct.percentage));
 
 		return this;
 	}
@@ -141,8 +143,9 @@ public class ResponseHelper {
 		if (productName == null) {
 			productName = firstProduct.name;
 		}
-		Assert.assertNotNull(productName, "Spec mismatch: first matched product does not contain '"
-				+ ItemsPath.PRODUCT_NAME + "' or '" + ItemsPath.NAME + "'.");
+		Assert.assertNotNull(productName, String.format(
+				"Spec mismatch: first matched product does not contain '%s' or '%s'.",
+				ItemsPath.PRODUCT_NAME, ItemsPath.NAME));
 		return productName;
 	}
 
