@@ -38,66 +38,72 @@ public class ResponseHelper {
 		return this;
 	}
 
-	public ResponseHelper verifyMatchedInternalProductsIdCountEquals(long expectedCount, String message) {
-		Assert.assertEquals(getMatchedInternalProductsIdCount(), expectedCount, message);
+	public ResponseHelper verifyMatchedInternalProductsIdCountEquals(long expectedCount) {
+		Assert.assertEquals(getMatchedInternalProductsIdCount(), expectedCount,
+				"Expected matchedInternalProducts id count to equal " + expectedCount);
 		return this;
 	}
 
-	public ResponseHelper verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount, String message) {
-		Assert.assertTrue(getMatchedInternalProductsIdCount() <= maxCount, message);
+	public ResponseHelper verifyMatchedInternalProductsIdCountLessThanOrEqual(long maxCount) {
+		Assert.assertTrue(getMatchedInternalProductsIdCount() <= maxCount,
+				"Expected matchedInternalProducts id count to be <= " + maxCount);
 		return this;
 	}
 
-	public ResponseHelper verifyMatchedInternalProductsIdCountGreaterThan(long minCount, String message) {
-		Assert.assertTrue(getMatchedInternalProductsIdCount() > minCount, message);
+	public ResponseHelper verifyMatchedInternalProductsIdCountGreaterThan(long minCount) {
+		Assert.assertTrue(getMatchedInternalProductsIdCount() > minCount,
+				"Expected matchedInternalProducts id count to be > " + minCount);
 		return this;
 	}
 
-	public ResponseHelper verifyMatchedInternalProductsOrderDifferentFrom(ResponseHelper other, String message) {
+	public ResponseHelper verifyMatchedInternalProductsOrderDifferentFrom(ResponseHelper other) {
 		List<String> currentOrder = getMatchedInternalProductIdsInOrder();
 		List<String> otherOrder = other.getMatchedInternalProductIdsInOrder();
 
 		Assert.assertFalse(currentOrder.isEmpty() && otherOrder.isEmpty(),
-				"Both responses returned empty matched product IDs. " + message);
-		Assert.assertNotEquals(currentOrder, otherOrder, message);
+				"Both responses returned empty matched product IDs.");
+		Assert.assertNotEquals(currentOrder, otherOrder,
+				"Expected a different order of matchedInternalProducts between responses");
 		return this;
 	}
 
-	public ResponseHelper verifyFirstMatchedInternalProductNameContains(String expectedSubstring, String message) {
+	public ResponseHelper verifyFirstMatchedInternalProductNameContains(String expectedSubstring) {
 		String productName = getFirstMatchedInternalProductName();
 		Assert.assertTrue(productName.toLowerCase().contains(expectedSubstring.toLowerCase()),
-				message + ". First product name: '" + productName + "'");
+				"Expected first matched product name to contain '" + expectedSubstring + "'. First product name: '"
+						+ productName + "'");
 		return this;
 	}
 
-	public ResponseHelper verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring, String message) {
+	public ResponseHelper verifyFirstMatchedInternalProductNameNotContains(String unexpectedSubstring) {
 		String productName = getFirstMatchedInternalProductName();
 		Assert.assertFalse(productName.toLowerCase().contains(unexpectedSubstring.toLowerCase()),
-				message + ". First product name: '" + productName + "'");
+				"Expected first matched product name not to contain '" + unexpectedSubstring
+						+ "'. First product name: '" + productName + "'");
 		return this;
 	}
 
-	public ResponseHelper verifyFirstMatchedInternalProductHasCoreMetadata(String message) {
+	public ResponseHelper verifyFirstMatchedInternalProductHasCoreMetadata() {
 		MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
 
-		Assert.assertNotNull(firstProduct._id, message + " Missing field: _id");
-		Assert.assertFalse(firstProduct._id.isBlank(), message + " Field is blank: _id");
-		Assert.assertNotNull(firstProduct.sku, message + " Missing field: sku");
-		Assert.assertFalse(firstProduct.sku.isBlank(), message + " Field is blank: sku");
+		Assert.assertNotNull(firstProduct._id, "Missing field: _id");
+		Assert.assertFalse(firstProduct._id.isBlank(), "Field is blank: _id");
+		Assert.assertNotNull(firstProduct.sku, "Missing field: sku");
+		Assert.assertFalse(firstProduct.sku.isBlank(), "Field is blank: sku");
 
 		String vendorName = getVendorName(firstProduct.vendor);
-		Assert.assertNotNull(vendorName, message + " Missing vendor name");
-		Assert.assertFalse(vendorName.isBlank(), message + " Field is blank: vendor name");
+		Assert.assertNotNull(vendorName, "Missing vendor name");
+		Assert.assertFalse(vendorName.isBlank(), "Field is blank: vendor name");
 
 		String imagePath = getPrimaryImagePath(firstProduct);
-		Assert.assertNotNull(imagePath, message + " Missing product image path");
-		Assert.assertFalse(imagePath.isBlank(), message + " Field is blank: product image path");
+		Assert.assertNotNull(imagePath, "Missing product image path");
+		Assert.assertFalse(imagePath.isBlank(), "Field is blank: product image path");
 
 		// Current schema does not return price/inStock; percentage is the closest
 		// quality signal.
-		Assert.assertNotNull(firstProduct.percentage, message + " Missing field: percentage");
+		Assert.assertNotNull(firstProduct.percentage, "Missing field: percentage");
 		Assert.assertTrue(firstProduct.percentage >= 0 && firstProduct.percentage <= 100,
-				message + " Invalid percentage value: " + firstProduct.percentage);
+				"Invalid percentage value: " + firstProduct.percentage);
 
 		return this;
 	}

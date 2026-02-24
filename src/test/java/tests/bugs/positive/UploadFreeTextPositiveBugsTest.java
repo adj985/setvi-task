@@ -20,14 +20,11 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
 		UploadFreeTextRequest rankingEnabledRequest = new UploadFreeTextRequest(text, 10, 0.5, true);
 
 		ResponseHelper rankingDisabledResponse = uploadFreeText(Constants.API_KEY, rankingDisabledRequest)
-				.verifyStatusCode(200).verifyMatchedInternalProductsIdCountGreaterThan(0,
-						"Expected non-empty matches when private label ranking is disabled");
+				.verifyStatusCode(200).verifyMatchedInternalProductsIdCountGreaterThan(0);
 
 		uploadFreeText(Constants.API_KEY, rankingEnabledRequest).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0,
-						"Expected non-empty matches when private label ranking is enabled")
-				.verifyMatchedInternalProductsOrderDifferentFrom(rankingDisabledResponse,
-						"Expected different product order when enablePrivateLabelRanking=true");
+				.verifyMatchedInternalProductsIdCountGreaterThan(0)
+				.verifyMatchedInternalProductsOrderDifferentFrom(rankingDisabledResponse);
 	}
 
 	/**
@@ -40,12 +37,8 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
 		UploadFreeTextRequest request = new UploadFreeTextRequest(text, 3, 0.5, false);
 
 		uploadFreeText(Constants.API_KEY, request).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0,
-						"Expected non-empty matches for cutting board query")
-				.verifyFirstMatchedInternalProductNameContains("board",
-						"Expected top match to be a cutting-board related product")
-				.verifyFirstMatchedInternalProductNameNotContains("spoon",
-						"Unexpected irrelevant spoon product at top rank");
+				.verifyMatchedInternalProductsIdCountGreaterThan(0).verifyFirstMatchedInternalProductNameContains("board")
+				.verifyFirstMatchedInternalProductNameNotContains("spoon");
 	}
 
 	/**
@@ -57,9 +50,6 @@ public class UploadFreeTextPositiveBugsTest extends BaseApiTest {
 		UploadFreeTextRequest request = new UploadFreeTextRequest("Cutting Board", 3, 0.5, false);
 
 		uploadFreeText(Constants.API_KEY, request).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0,
-						"Expected at least one matched product for metadata validation")
-				.verifyFirstMatchedInternalProductHasCoreMetadata(
-						"Spec mismatch: first matched product should include core metadata fields");
+				.verifyMatchedInternalProductsIdCountGreaterThan(0).verifyFirstMatchedInternalProductHasCoreMetadata();
 	}
 }

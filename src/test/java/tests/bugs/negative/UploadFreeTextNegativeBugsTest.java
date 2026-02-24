@@ -49,9 +49,9 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 		UploadFreeTextRequest bodyTopKTen = new UploadFreeTextRequest(someText, 10, 0.5, false);
 
 		uploadFreeText(Constants.API_KEY, bodyTopKOne).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountEquals(1, "topK=1 should return exactly 1 product");
+				.verifyMatchedInternalProductsIdCountEquals(1);
 		uploadFreeText(Constants.API_KEY, bodyTopKTen).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountLessThanOrEqual(10, "topK=10 should return up to 10 products");
+				.verifyMatchedInternalProductsIdCountLessThanOrEqual(10);
 	}
 
 	/**
@@ -66,12 +66,10 @@ public class UploadFreeTextNegativeBugsTest extends BaseApiTest {
 		UploadFreeTextRequest quotedMeasurementBody = new UploadFreeTextRequest(quotedMeasurementText, 3, 0.5, null);
 
 		uploadFreeText(Constants.API_KEY, accentedTextBody).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0,
-						"Expected non-empty matches for accent-insensitive text: '" + accentedText + "'");
+				.verifyMatchedInternalProductsIdCountGreaterThan(0);
 
 		uploadFreeText(Constants.API_KEY, quotedMeasurementBody).verifyStatusCode(200)
-				.verifyMatchedInternalProductsIdCountGreaterThan(0,
-						"Expected non-empty matches for quoted measurement text: '" + quotedMeasurementText + "'");
+				.verifyMatchedInternalProductsIdCountGreaterThan(0);
 	}
 
 }
