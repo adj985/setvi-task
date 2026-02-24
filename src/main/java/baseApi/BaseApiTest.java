@@ -24,12 +24,19 @@ public class BaseApiTest extends RestAssured {
 	private ResponseHelper postRequest(String endpoint, String apiKey, Object requestBody) {
 
 		return new ResponseHelper(
-				given().spec(buildRequestSpec(apiKey)).body(gson.toJson(requestBody)).when().post(endpoint));
+				given()
+						.spec(buildRequestSpec(apiKey))
+						.body(gson.toJson(requestBody))
+						.when()
+						.post(endpoint));
 	}
 
 	private RequestSpecification buildRequestSpec(String apiKey) {
-		return new RequestSpecBuilder().setBaseUri(Constants.BASE_URL).addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", apiKey).build();
+		return new RequestSpecBuilder()
+				.setBaseUri(Constants.BASE_URL)
+				.addHeader("Content-Type", "application/json")
+				.addHeader("Authorization", apiKey)
+				.build();
 	}
 
 }
