@@ -2,8 +2,8 @@ package baseApi;
 
 import baseApi.constants.Constants;
 import baseApi.constants.Endpoints;
-import baseApi.models.request.UploadFreeTextRequest;
-import baseApi.models.request.UploadUrlRequest;
+import baseApi.dto.request.UploadFreeTextRequest;
+import baseApi.dto.request.UploadUrlRequest;
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;

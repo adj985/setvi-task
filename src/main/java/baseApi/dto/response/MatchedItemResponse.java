@@ -1,4 +1,4 @@
-package baseApi.models.response;
+package baseApi.dto.response;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package tests.bugs.positive;
 import baseApi.BaseApiTest;
 import baseApi.ResponseHelper;
 import baseApi.constants.Constants;
-import baseApi.models.request.UploadFreeTextRequest;
+import baseApi.dto.request.UploadFreeTextRequest;
 import org.testng.annotations.Test;
 
 public class UploadFreeTextPositiveBugsTest extends BaseApiTest {

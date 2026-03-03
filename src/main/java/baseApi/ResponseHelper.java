@@ -1,8 +1,8 @@
 package baseApi;
 
 import baseApi.constants.ItemsPath;
-import baseApi.models.response.MatchedInternalProductResponse;
-import baseApi.models.response.MatchedItemResponse;
+import baseApi.dto.response.MatchedInternalProductResponse;
+import baseApi.dto.response.MatchedItemResponse;
 import io.restassured.response.Response;
 import org.testng.Assert;
 
@@ -20,7 +20,7 @@ public class ResponseHelper {
 
 	public ResponseHelper(Response response) {
 		this.response = response;
-		// printResponseBody();
+		 printResponseBody();
 	}
 
 	public ResponseHelper verifyStatusCode(int statusCode) {
@@ -139,12 +139,6 @@ public class ResponseHelper {
 				.collect(Collectors.toList());
 	}
 
-	private MatchedInternalProductResponse getFirstMatchedInternalProduct() {
-		List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
-		Assert.assertFalse(matchedInternalProducts.isEmpty(), "No matchedInternalProducts found in first matched item");
-		return matchedInternalProducts.getFirst();
-	}
-
 	private String getFirstMatchedInternalProductName() {
 		MatchedInternalProductResponse firstProduct = getFirstMatchedInternalProduct();
 		String productName = firstProduct.productName;
@@ -155,6 +149,12 @@ public class ResponseHelper {
 				"Spec mismatch: first matched product does not contain '%s' or '%s'.",
 				ItemsPath.PRODUCT_NAME, ItemsPath.NAME));
 		return productName;
+	}
+
+	private MatchedInternalProductResponse getFirstMatchedInternalProduct() {
+		List<MatchedInternalProductResponse> matchedInternalProducts = getMatchedInternalProductsFromFirstResultItem();
+		Assert.assertFalse(matchedInternalProducts.isEmpty(), "No matchedInternalProducts found in first matched item");
+		return matchedInternalProducts.getFirst();
 	}
 
 	private List<MatchedInternalProductResponse> getMatchedInternalProductsFromFirstResultItem() {

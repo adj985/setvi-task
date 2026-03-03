@@ -2,7 +2,7 @@ package tests.bugs.negative;
 
 import baseApi.BaseApiTest;
 import baseApi.constants.Constants;
-import baseApi.models.request.UploadUrlRequest;
+import baseApi.dto.request.UploadUrlRequest;
 import org.testng.annotations.Test;
 
 import static baseApi.constants.ErrorMessages.PLEASE_PROVIDE_VALID_URL;
