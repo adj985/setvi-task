@@ -1,5 +1,6 @@
 package baseApi;
 
+import baseApi.constants.ApiHeaders;
 import baseApi.constants.Constants;
 import baseApi.constants.Endpoints;
 import baseApi.dto.request.UploadFreeTextRequest;
@@ -34,8 +35,8 @@ public class BaseApiTest extends RestAssured {
 	private RequestSpecification buildRequestSpec(String apiKey) {
 		return new RequestSpecBuilder()
 				.setBaseUri(Constants.BASE_URL)
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", apiKey)
+				.addHeader(ApiHeaders.CONTENT_TYPE, ApiHeaders.APPLICATION_JSON)
+				.addHeader(ApiHeaders.AUTHORIZATION, apiKey)
 				.build();
 	}
 
